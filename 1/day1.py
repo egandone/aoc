@@ -103,4 +103,5 @@ masses = '''95423
 '''
 masses = masses.split()
 total_fuel_requirement = get_total_fuel_required(masses)
-print(f'Total fuel requirement for {len(masses)} is {total_fuel_requirement}')
+print(
+    f'Total fuel requirement for {len(masses)} masses is {total_fuel_requirement}')
