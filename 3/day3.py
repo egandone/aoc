@@ -9,3 +9,8 @@ print(intersections)
 shortest_distance = abs(intersections[0][0]) + abs(intersections[0][1])
 print(
     f'Nearest intersection @ {intersections[0]} - distance = {shortest_distance}')
+
+steps = {wire1.get_steps_to_point(
+    p) + wire2.get_steps_to_point(p): p for p in intersections}
+min_steps = min(steps)
+print(f'Smallest steps = {min_steps} for {steps[min_steps]}')

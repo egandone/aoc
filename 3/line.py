@@ -28,6 +28,13 @@ class Wire:
     def get_points_set(self):
         return set(self._points)
 
+    def get_steps_to_point(self, p):
+        step = 0
+        if p in self._points:
+            while self._points[step] != p:
+                step += 1
+        return step
+
 
 def build_wire(path):
     segments = path.split(',')

@@ -16,6 +16,22 @@ def test_segment_direction():
     assert left.next_point((0, 0)) == (0, -1)
 
 
+def test_steps_algorithm():
+    wire1 = build_wire('R75,D30,R83,U83,L12,D49,R71,U7,L72')
+    wire2 = build_wire('U62,R66,U55,R34,D71,R55,D58,R83')
+    crosses = find_intersections(wire1, wire2)
+    steps = {wire1.get_steps_to_point(
+        p) + wire2.get_steps_to_point(p): p for p in crosses}
+    assert min(steps) == 610
+
+    wire1 = build_wire('R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51')
+    wire2 = build_wire('U98,R91,D20,R16,D67,R40,U7,R15,U6,R7')
+    crosses = find_intersections(wire1, wire2)
+    steps = {wire1.get_steps_to_point(
+        p) + wire2.get_steps_to_point(p): p for p in crosses}
+    assert min(steps) == 410
+
+
 def test_distance_algorithm():
     wire1 = build_wire('R75,D30,R83,U83,L12,D49,R71,U7,L72')
     wire2 = build_wire('U62,R66,U55,R34,D71,R55,D58,R83')
@@ -42,6 +58,8 @@ def test_wire():
                                       (4, 3), (3, 3), (2, 3)}
     wire1b = build_wire('R8,U5,L5,D3')
     assert wire1b.get_points_set() == wire1.get_points_set()
+    assert wire1.get_steps_to_point((3, 3)) == 20
+    assert wire1.get_steps_to_point((5, 6)) == 15
 
     # U7,R6,D4,L4
     wire2 = Wire()
@@ -58,3 +76,5 @@ def test_wire():
 
     wire2b = build_wire('U7,R6,D4,L4')
     assert wire2b.get_points_set() == wire2.get_points_set()
+    assert wire2.get_steps_to_point((3, 3)) == 20
+    assert wire2.get_steps_to_point((5, 6)) == 15
