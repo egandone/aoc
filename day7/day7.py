@@ -4,22 +4,27 @@ import builtins
 from itertools import permutations
 from threading import Thread
 from queue import Queue
+import time
 
-def get_mock_input(q):
-    def mock_input(s):
-        return q.get()
-    return mock_input
+# def get_mock_input(q):
+#     def mock_input(s):
+#         data = None
+#         while data == None:
+#             try:
+#                 data = q.get(timeout=1)
+#             except:
+#                 time.sleep(1)
+#         return data                        
+#     return mock_input
 
-def get_mock_output(q):
-    def mock_output(s):
-        q.put(int(s))
-    return mock_output
+# def get_mock_output(q):
+#     def mock_output(s):
+#         q.put(int(s))
+#     return mock_output
 
 def run_program(instructions, inq, outq):
-    with mock.patch.object(builtins, 'input', get_mock_input(inq)):
-        with mock.patch.object(builtins, 'print', get_mock_output(outq)):
-            program = instructions.copy()
-            execute(program)
+    program = instructions.copy()
+    execute(program, inq, outq)
 
 
 def run_amplifiers(code, i1, i2, i3, i4, i5):
@@ -30,28 +35,30 @@ def run_amplifiers(code, i1, i2, i3, i4, i5):
     inq3 = Queue()
     inq3.put(i3)
     inq4 = Queue()
-    inq2.put(i2)
+    inq4.put(i4)
     inq5 = Queue()
-    inq2.put(i2)
-    amp1 = Thread(target=run_program(code, inq1, inq2)
-    amp2 = Thread(target=run_program(code, inq2, inq3)
-    amp3 = Thread(target=run_program(code, inq3, inq4)
-    amp4 = Thread(target=run_program(code, inq4, inq5)
-    amp5 = Thread(target=run_program(code, inq5, inq1)
+    inq5.put(i5)
+    threads = []
+    amp1 = Thread(target=run_program, args=(code, inq1, inq2))
+    threads.append(amp1)
+    amp2 = Thread(target=run_program, args=(code, inq2, inq3))
+    threads.append(amp2)
+    amp3 = Thread(target=run_program, args=(code, inq3, inq4))
+    threads.append(amp3)
+    amp4 = Thread(target=run_program, args=(code, inq4, inq5))
+    threads.append(amp4)
+    amp5 = Thread(target=run_program, args=(code, inq5, inq1))
+    threads.append(amp5)
 
-    inq.put(i2)
-    inq.put(outq.get())
-    o2 = run_program(code, inq, outq)
-    inq.put(i3)
-    inq.put(outq.get())
-    o3 = run_program(code, inq, outq)
-    inq.put(i4)
-    inq.put(outq.get())
-    o4 = run_program(code, inq, outq)
-    inq.put(i5)
-    inq.put(outq.get())
-    o5 = run_program(code, inq, outq)
-    return outq.get()
+    for t in threads:
+        t.daemon = True
+        t.start()
+    inq1.put(0)
+
+    for t in threads:
+        t.join()            
+        
+    return inq1.get()
 
 
 if __name__ == "__main__":
@@ -59,7 +66,15 @@ if __name__ == "__main__":
     results = dict()
     for p in permutations([0,1,2,3,4]):
         out = run_amplifiers(amp, *p)
-        print(f'{p} -> {out}')
+#        print(f'{p} -> {out}')
         results[out] = p
     best = max(results)
-    print(f'best output is {best} using {results[best]}')
+    print(f'Day1 - best output is {best} using {results[best]}')
+
+    results = dict()
+    for p in permutations([5,6,7,8,9]):
+        out = run_amplifiers(amp, *p)
+#        print(f'{p} -> {out}')
+        results[out] = p
+    best = max(results)
+    print(f'Day2 - best output is {best} using {results[best]}')

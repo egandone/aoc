@@ -89,19 +89,29 @@ class Equals(OpCode):
 
 
 class In(OpCode):
+    in_queue = None
+
     def execute(self, instructions, position):
-        _in = int(input('IN: '))
+        if self.in_queue:
+            _in = self.in_queue.get()
+        else:
+            _in = int(input('IN: '))
         instructions[instructions[position]] = _in
         return position + 1
 
 
 class Out(OpCode):
+    out_queue = None
+
     def __init__(self, inmodes):
         super().__init__(inmodes)
 
     def execute(self, instructions, position):
         out = self.get_in(0, instructions, position)
-        print(out)
+        if self.out_queue:
+            self.out_queue.put(out)
+        else:
+            print(out)
         return position + 1
 
 

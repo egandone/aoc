@@ -1,7 +1,7 @@
 from aoc_opcode import Add, Mult, In, Out, End, IfTrue, IfFalse, Less, Equals
 
 
-def create_opcode(opcode):
+def create_opcode(opcode, inq, outq):
     full_opcode = f'{opcode:05d}'
     param_modes = (int(full_opcode[2]), int(
         full_opcode[1]), int(full_opcode[0]))
@@ -11,9 +11,13 @@ def create_opcode(opcode):
     elif f == '02':
         return Mult(param_modes)
     elif f == '03':
-        return In()
+        opcode = In()
+        opcode.in_queue = inq
+        return opcode
     elif f == '04':
-        return Out(param_modes)
+        opcode = Out(param_modes)
+        opcode.out_queue = outq
+        return opcode
     elif f == '05':
         return IfTrue(param_modes)
     elif f == '06':
@@ -26,13 +30,13 @@ def create_opcode(opcode):
         return End()
 
 
-def execute(instructions):
+def execute(instructions, inq=None, outq=None):
     position = 0
     while position >= 0:
         #        print(f'[{position}] {instructions}')
         opcode = instructions[position]
         position += 1
-        opcode = create_opcode(opcode)
+        opcode = create_opcode(opcode, inq, outq)
         position = opcode.execute(instructions, position)
 
     return instructions
