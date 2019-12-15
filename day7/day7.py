@@ -6,22 +6,6 @@ from threading import Thread
 from queue import Queue
 import time
 
-# def get_mock_input(q):
-#     def mock_input(s):
-#         data = None
-#         while data == None:
-#             try:
-#                 data = q.get(timeout=1)
-#             except:
-#                 time.sleep(1)
-#         return data                        
-#     return mock_input
-
-# def get_mock_output(q):
-#     def mock_output(s):
-#         q.put(int(s))
-#     return mock_output
-
 def run_program(instructions, inq, outq):
     program = instructions.copy()
     execute(program, inq, outq)
