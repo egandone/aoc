@@ -3,54 +3,54 @@ class CPU:
         self.acc = 0
 
 
-class NOP:
-    def __init__(self, i):
-        self._operand = i
-        pass
+class Opcode:
+    def __init__(self, operand):
+        self._operand = operand
 
+    def repr(self, prefix):
+        return f'{prefix} {self._operand: 4}'
+
+
+class NOP(Opcode):
     def execute(self, cpu):
         return 1
 
     def __repr__(self):
-        return f'NOP {self._operand: 4}'
+        return super().repr('nop')
 
 
-class ACC:
-    def __init__(self, i):
-        self._operand = i
-
+class ACC(Opcode):
     def execute(self, cpu):
         cpu.acc += self._operand
         return 1
 
     def __repr__(self):
-        return f'ACC {self._operand: 4}'
+        return super().repr('add')
 
 
-class JMP:
-    def __init__(self, i):
-        self._operand = i
-
+class JMP(Opcode):
     def execute(self, cpu):
         return self._operand
 
     def __repr__(self):
-        return f'JMP {self._operand: 4}'
+        return super().repr('jmp')
+
+
+def create_opcode(line):
+    opcode, operand = line.strip().split(' ')
+    operand = int(operand)
+    if opcode == 'nop':
+        return NOP(operand)
+    elif opcode == 'acc':
+        return ACC(operand)
+    elif opcode == 'jmp':
+        return JMP(operand)
+    else:
+        raise ValueError(f'unknown opcode {opcode}')
 
 
 def parse_program(lines):
-    instructions = []
-    for line in lines:
-        opcode, operand = line.split(' ')
-        operand = int(operand)
-        if opcode == 'nop':
-            instructions.append(NOP(operand))
-        elif opcode == 'acc':
-            instructions.append(ACC(operand))
-        elif opcode == 'jmp':
-            instructions.append(JMP(operand))
-        else:
-            raise ValueError(f'unknown opcode {opcode}')
+    instructions = [create_opcode(l) for l in lines]
     return instructions
 
 
@@ -81,7 +81,7 @@ for i in range(0, len(instructions)):
 
         try:
             acc = run_program(new_instructions)
-            print(f'{acc}')
+            print(f'successfull result: {acc}')
             break
         except:
             print(
